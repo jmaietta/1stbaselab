@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>First Base Lab</title>
-  <meta name="description" content="A mobile-first first-base training app with pro-inspired drills, timers, scoring, and plain-English baseball definitions." />
+  <meta name="description" content="A mobile-first first-base training app with pro-inspired drills, setup, scoring, and quick checklists." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312345a'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='38' font-weight='800' fill='white'%3EF%3C/text%3E%3C/svg%3E" />
   <link rel="apple-touch-icon" sizes="180x180" href="fratto-icon-180.png" />
   <style>
@@ -24,7 +24,7 @@
       --green-soft: #eaf7f2;
       --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
       color-scheme: light;
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -81,9 +81,10 @@
 
     .brand h1 {
       margin: 0;
-      font-size: clamp(22px, 5vw, 32px);
-      line-height: 1.05;
+      font-size: clamp(21px, 4vw, 28px);
+      line-height: 1.12;
       letter-spacing: 0;
+      font-weight: 650;
     }
 
     .brand p {
@@ -151,6 +152,7 @@
       font-size: 22px;
       line-height: 1.2;
       letter-spacing: 0;
+      font-weight: 650;
     }
 
     .intro p {
@@ -231,11 +233,12 @@
       margin: 0;
       font-size: 22px;
       line-height: 1.1;
+      color: var(--navy);
     }
 
     .section-title p {
       margin: 0;
-      color: var(--muted);
+      color: #344054;
       font-size: 14px;
       font-weight: 500;
     }
@@ -255,8 +258,9 @@
       min-height: 64px;
       padding: 10px;
       border: 1px solid var(--line);
+      border-left: 4px solid var(--drill-color, var(--navy));
       border-radius: 8px;
-      background: var(--surface);
+      background: linear-gradient(90deg, color-mix(in srgb, var(--drill-color, var(--navy)) 7%, white), var(--surface));
       color: var(--ink);
       text-align: left;
       cursor: pointer;
@@ -275,16 +279,17 @@
       display: block;
       margin-bottom: 2px;
       font-size: 15px;
+      color: var(--drill-color, var(--navy));
     }
 
     .focus-btn span {
-      color: var(--muted);
+      color: #344054;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .chev {
-      color: var(--muted);
+      color: var(--drill-color, var(--navy));
       font-size: 20px;
       line-height: 1;
     }
@@ -315,9 +320,10 @@
 
     .drill-head h2 {
       margin: 0;
-      font-size: clamp(26px, 6vw, 40px);
-      line-height: 1.05;
+      font-size: clamp(25px, 5vw, 34px);
+      line-height: 1.12;
       letter-spacing: 0;
+      font-weight: 650;
     }
 
     .drill-head p {
@@ -667,15 +673,16 @@
         align-items: start;
       }
 
-      .drill-head,
-      .stepper,
-      .copy-box {
+      .drill-head {
+        grid-column: 1 / -1;
+      }
+
+      .stepper {
         grid-column: 1;
       }
 
-      .timer-card {
+      .copy-box {
         grid-column: 2;
-        grid-row: 1 / span 2;
         position: sticky;
         top: 16px;
       }
@@ -895,11 +902,10 @@
       <section class="panel intro" id="start">
         <div>
           <h2>Pick today&apos;s focus.</h2>
-          <p>You&apos;ll get one drill with setup, reps, scoring, a timer, and definitions.</p>
+          <p>You&apos;ll get one drill with setup, reps, scoring, and a quick checklist.</p>
         </div>
         <div class="quick-actions">
           <button class="btn primary" type="button" id="randomBtn">Pick for me</button>
-          <button class="btn" type="button" data-open-drawer="all">Terms</button>
         </div>
       </section>
 
@@ -913,18 +919,6 @@
       <section class="panel" id="work">
         <div class="workbench">
           <article class="drill-head" id="drillHead"></article>
-
-          <section class="timer-card" aria-label="Drill timer">
-            <div>
-              <div class="timer-label" id="timerLabel">Timer</div>
-              <div class="timer-time" id="timerTime">10:00</div>
-            </div>
-            <div class="button-row">
-              <button class="btn primary" type="button" id="startTimer">Start</button>
-              <button class="btn" type="button" id="pauseTimer">Pause</button>
-              <button class="btn" type="button" id="resetTimer">Reset</button>
-            </div>
-          </section>
 
           <section class="stepper" aria-label="Drill steps">
             <div class="step-tabs" role="tablist" aria-label="Step selector">
@@ -949,40 +943,10 @@
             </div>
           </section>
 
-          <div class="term-strip" id="termStrip" aria-label="Terms for this drill"></div>
-        </div>
-      </section>
-
-      <section class="panel" id="sources">
-        <div class="section-title">
-          <h2>Sources</h2>
-          <p>Original examples behind the drills.</p>
-        </div>
-        <div class="sources">
-          <a class="source-link" href="https://probaseballinsider.com/pregame-hitting-routine/" target="_blank" rel="noreferrer">Aaron Judge hitting routine</a>
-          <a class="source-link" href="https://www.mlb.com/amp/news/how-juan-soto-developed-his-two-strike-batting-stance.html" target="_blank" rel="noreferrer">Juan Soto two-strike approach</a>
-          <a class="source-link" href="https://www.mlb.com/cubs/news/cubs-first-baseman-anthony-rizzos-two-strike-approach-among-best/c-122962860" target="_blank" rel="noreferrer">Anthony Rizzo two-strike approach</a>
-          <a class="source-link" href="https://www.theoleballgame.com/firstbaseman-pick-drill.html" target="_blank" rel="noreferrer">First-base pick drill</a>
-          <a class="source-link" href="https://www.mlb.com/news/paul-goldschmidt-always-looking-to-improve-c163787596" target="_blank" rel="noreferrer">Paul Goldschmidt offseason speed work</a>
-          <a class="source-link" href="https://www.mlb.com/news/aaron-judge-giancarlo-stanton-change-offseason-workouts" target="_blank" rel="noreferrer">Judge and Stanton mobility emphasis</a>
-          <a class="source-link" href="https://www.mlb.com/amp/news/mookie-betts-adds-javelin-throwing-to-workouts.html" target="_blank" rel="noreferrer">Mookie Betts full-body sequencing note</a>
         </div>
       </section>
     </main>
   </div>
-
-  <nav class="bottom-nav" aria-label="Quick navigation">
-    <button class="nav-btn active" type="button" data-scroll="#focus">Focus</button>
-    <button class="nav-btn" type="button" data-scroll="#work">Work</button>
-    <button class="nav-btn" type="button" data-open-drawer="all">Terms</button>
-  </nav>
-
-  <aside class="drawer" id="drawer" aria-live="polite" aria-label="Definitions">
-    <div class="button-row">
-      <button class="btn dark" type="button" id="closeDrawer">Close</button>
-    </div>
-    <div id="drawerContent"></div>
-  </aside>
 
   <script>
     const definitions = {
@@ -1173,10 +1137,7 @@
 
     const state = {
       activeDrill: drills[0],
-      step: 0,
-      timerSeconds: drills[0].minutes * 60,
-      timerBase: drills[0].minutes * 60,
-      timerId: null
+      step: 0
     };
 
     const scoreKey = "firstBaseLabScore";
@@ -1184,13 +1145,8 @@
     const focusGrid = document.getElementById("focusGrid");
     const drillHead = document.getElementById("drillHead");
     const stepBody = document.getElementById("stepBody");
-    const timerTime = document.getElementById("timerTime");
-    const timerLabel = document.getElementById("timerLabel");
     const quickChecklist = document.getElementById("quickChecklist");
-    const termStrip = document.getElementById("termStrip");
     const logStatus = document.getElementById("logStatus");
-    const drawer = document.getElementById("drawer");
-    const drawerContent = document.getElementById("drawerContent");
 
     function getScore() {
       return Number(localStorage.getItem(scoreKey) || 0);
@@ -1199,27 +1155,6 @@
     function setScore(value) {
       localStorage.setItem(scoreKey, String(value));
       scoreEl.textContent = value;
-    }
-
-    function formatTime(totalSeconds) {
-      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
-      const seconds = (totalSeconds % 60).toString().padStart(2, "0");
-      return `${minutes}:${seconds}`;
-    }
-
-    function stopTimer() {
-      if (state.timerId) {
-        clearInterval(state.timerId);
-        state.timerId = null;
-      }
-    }
-
-    function resetTimerForDrill(drill) {
-      stopTimer();
-      state.timerBase = drill.minutes * 60;
-      state.timerSeconds = state.timerBase;
-      timerLabel.textContent = `${drill.title} timer`;
-      timerTime.textContent = formatTime(state.timerSeconds);
     }
 
     function renderFocus() {
@@ -1261,7 +1196,6 @@
           <span>${item}</span>
         </div>
       `).join("");
-      termStrip.innerHTML = drill.terms.map((term) => `<button class="term-chip" type="button" data-term="${term}">${term}</button>`).join("");
       logStatus.textContent = "";
     }
 
@@ -1270,28 +1204,9 @@
       if (!next) return;
       state.activeDrill = next;
       state.step = 0;
-      resetTimerForDrill(next);
       renderFocus();
       renderDrill();
       document.querySelector("#work").scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    function openDrawer(term) {
-      if (term === "all") {
-        drawerContent.innerHTML = `
-          <h2>Terms</h2>
-          <p>Tap a term on a drill card when you need it. This is the full list.</p>
-          <div class="glossary-list">
-            ${Object.entries(definitions).map(([name, value]) => `<div class="glossary-item"><strong>${name}</strong><span>${value}</span></div>`).join("")}
-          </div>
-        `;
-      } else {
-        drawerContent.innerHTML = `
-          <h2>${term}</h2>
-          <p>${definitions[term] || "Definition not found."}</p>
-        `;
-      }
-      drawer.classList.add("open");
     }
 
     focusGrid.addEventListener("click", (event) => {
@@ -1316,22 +1231,6 @@
       renderDrill();
     });
 
-    document.getElementById("startTimer").addEventListener("click", () => {
-      if (state.timerId) return;
-      state.timerId = setInterval(() => {
-        state.timerSeconds = Math.max(0, state.timerSeconds - 1);
-        timerTime.textContent = formatTime(state.timerSeconds);
-        if (state.timerSeconds === 0) stopTimer();
-      }, 1000);
-    });
-
-    document.getElementById("pauseTimer").addEventListener("click", stopTimer);
-    document.getElementById("resetTimer").addEventListener("click", () => {
-      stopTimer();
-      state.timerSeconds = state.timerBase;
-      timerTime.textContent = formatTime(state.timerSeconds);
-    });
-
     document.getElementById("logDone").addEventListener("click", () => {
       setScore(getScore() + state.activeDrill.points);
       logStatus.textContent = `Logged ${state.activeDrill.points} points for ${state.activeDrill.title}.`;
@@ -1347,30 +1246,8 @@
       chooseDrill(next.id);
     });
 
-    termStrip.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-term]");
-      if (button) openDrawer(button.dataset.term);
-    });
-
-    document.querySelectorAll("[data-open-drawer]").forEach((button) => {
-      button.addEventListener("click", () => openDrawer(button.dataset.openDrawer));
-    });
-
-    document.getElementById("closeDrawer").addEventListener("click", () => {
-      drawer.classList.remove("open");
-    });
-
-    document.querySelectorAll("[data-scroll]").forEach((button) => {
-      button.addEventListener("click", () => {
-        document.querySelector(button.dataset.scroll).scrollIntoView({ behavior: "smooth", block: "start" });
-        document.querySelectorAll(".nav-btn").forEach((nav) => nav.classList.remove("active"));
-        button.classList.add("active");
-      });
-    });
-
     setScore(getScore());
     renderFocus();
-    resetTimerForDrill(state.activeDrill);
     renderDrill();
   </script>
 </body>
