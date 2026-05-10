@@ -1,0 +1,25 @@
+{
+  "name": "First Base Lab",
+  "short_name": "1B Lab",
+  "description": "A simple first-base training drill picker with setup, scoring, and quick checklists.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f6f4",
+  "theme_color": "#12345a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "fratto-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "fratto-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
