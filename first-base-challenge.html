@@ -210,6 +210,17 @@
       color: #7a4b07;
     }
 
+    .btn.success {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .btn.success:hover {
+      border-color: #0a5f59;
+      background: #0a5f59;
+    }
+
     .section-title {
       display: grid;
       gap: 4px;
@@ -237,7 +248,7 @@
 
     .focus-btn {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: 1fr auto;
       gap: 12px;
       align-items: center;
       width: 100%;
@@ -258,18 +269,6 @@
     .focus-btn.active {
       border-color: var(--drill-color, var(--navy));
       background: linear-gradient(90deg, color-mix(in srgb, var(--drill-color, var(--navy)) 12%, white), #ffffff);
-    }
-
-    .focus-icon {
-      display: grid;
-      place-items: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      background: color-mix(in srgb, var(--drill-color, var(--navy)) 14%, white);
-      color: var(--drill-color, var(--navy));
-      font-size: 13px;
-      font-weight: 800;
     }
 
     .focus-btn strong {
@@ -692,27 +691,186 @@
 
     @media (max-width: 560px) {
       .app {
-        padding-right: 12px;
-        padding-left: 12px;
+        padding: 8px 8px 76px;
+      }
+
+      .layout {
+        gap: 8px;
       }
 
       .topbar {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding-bottom: 14px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 10px;
+        margin-bottom: 8px;
+      }
+
+      .mark {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+      }
+
+      .brand {
+        gap: 8px;
+      }
+
+      .brand h1 {
+        font-size: 18px;
+      }
+
+      .brand p {
+        font-size: 10px;
+        line-height: 1.15;
       }
 
       .score-pill {
-        justify-self: start;
+        min-width: 58px;
+        padding: 6px 7px;
+        justify-self: end;
       }
 
-      .quick-actions .btn,
+      .score-pill strong {
+        font-size: 18px;
+      }
+
+      .score-pill span {
+        font-size: 9px;
+      }
+
+      .panel {
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+      }
+
+      .intro {
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .intro h2 {
+        font-size: 20px;
+      }
+
+      .intro p {
+        font-size: 12px;
+      }
+
+      .quick-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .quick-actions .btn {
+        width: auto;
+        min-height: 36px;
+        padding: 7px 9px;
+      }
+
+      .section-title {
+        padding: 12px 12px 0;
+      }
+
+      .section-title h2 {
+        font-size: 18px;
+      }
+
+      .section-title p {
+        font-size: 12px;
+      }
+
+      .focus-grid,
+      .workbench,
+      .sources {
+        padding: 10px;
+      }
+
+      .focus-btn {
+        min-height: 56px;
+        gap: 8px;
+        padding: 8px;
+        grid-template-columns: 1fr auto;
+      }
+
+      .focus-btn strong {
+        font-size: 13px;
+      }
+
+      .focus-btn span {
+        font-size: 11px;
+      }
+
+      .drill-head,
+      .stepper,
+      .copy-box,
+      .timer-card {
+        padding: 10px;
+      }
+
+      .drill-head h2 {
+        font-size: 24px;
+      }
+
+      .drill-head p,
+      .step-body p {
+        font-size: 13px;
+      }
+
+      .step-body {
+        min-height: 120px;
+      }
+
+      .timer-time {
+        font-size: 48px;
+      }
+
+      .button-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
       .button-row .btn {
-        width: 100%;
+        width: auto;
+        min-height: 36px;
+        padding: 7px 8px;
+        font-size: 12px;
+      }
+
+      .copy-box .button-row,
+      .timer-card .button-row {
+        grid-template-columns: 1fr;
       }
 
       .meta-grid {
         grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .meta {
+        padding: 7px;
+      }
+
+      .term-chip {
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+
+      .checklist {
+        padding: 8px;
+      }
+
+      .check-item {
+        font-size: 12px;
+      }
+
+      .bottom-nav {
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
+        padding: 6px;
+      }
+
+      .nav-btn {
+        min-height: 36px;
       }
     }
   </style>
@@ -778,8 +936,8 @@
             <div class="step-body" id="stepBody"></div>
             <div class="button-row">
               <button class="btn" type="button" id="prevStep">Back</button>
-              <button class="btn dark" type="button" id="nextStep">Next</button>
-              <button class="btn primary" type="button" id="logDone">Log done</button>
+              <button class="btn primary" type="button" id="nextStep">Next</button>
+              <button class="btn success" type="button" id="logDone">Log done</button>
             </div>
             <div class="status" id="logStatus"></div>
           </section>
@@ -866,7 +1024,7 @@
         id: "two-strike",
         focus: "Two-strike at-bats",
         symptom: "You are expanding the zone or getting big with two strikes.",
-        icon: "2K",
+        icon: "Bat",
         color: "#b43b33",
         title: "Soto Two-Strike Round",
         pro: "Juan Soto",
@@ -891,7 +1049,7 @@
         id: "first-base",
         focus: "First-base picks",
         symptom: "You want to save more bad throws around the bag.",
-        icon: "1B",
+        icon: "Bag",
         color: "#0e5f4f",
         title: "First Base Pick Circuit",
         pro: "Elite first basemen",
@@ -916,7 +1074,7 @@
         id: "timing",
         focus: "Swing timing",
         symptom: "You feel late, rushed, or out of rhythm.",
-        icon: "T",
+        icon: "Time",
         color: "#24466f",
         title: "Judge Swing Progression",
         pro: "Aaron Judge",
@@ -941,7 +1099,7 @@
         id: "speed",
         focus: "First step and bases",
         symptom: "You want quicker starts and better turns.",
-        icon: "Go",
+        icon: "Run",
         color: "#c9881a",
         title: "Goldschmidt Speed Add-On",
         pro: "Paul Goldschmidt",
@@ -966,7 +1124,7 @@
         id: "mobility",
         focus: "Body readiness",
         symptom: "You feel stiff, slow, or beat up before work.",
-        icon: "M",
+        icon: "Move",
         color: "#5c4c97",
         title: "Big-Body Mobility",
         pro: "Judge / Stanton / Betts",
@@ -1068,7 +1226,6 @@
     function renderFocus() {
       focusGrid.innerHTML = drills.map((drill) => `
         <button class="focus-btn ${drill.id === state.activeDrill.id ? "active" : ""}" type="button" data-drill="${drill.id}" style="--drill-color:${drill.color}">
-          <span class="focus-icon">${drill.icon}</span>
           <span><strong>${drill.focus}</strong><span>${drill.symptom}</span></span>
           <span class="chev">›</span>
         </button>
