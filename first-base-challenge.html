@@ -1,0 +1,1221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>First Base Lab</title>
+  <meta name="description" content="A mobile-first first-base training app with pro-inspired drills, timers, scoring, and plain-English baseball definitions." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312345a'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='38' font-weight='800' fill='white'%3EF%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" sizes="180x180" href="fratto-icon-180.png" />
+  <style>
+    :root {
+      --bg: #f3f6f4;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --ink: #17212f;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --navy: #12345a;
+      --navy-2: #0d2744;
+      --teal: #0f766e;
+      --gold: #b7791f;
+      --cream: #fff7e8;
+      --blue-soft: #eaf3ff;
+      --green-soft: #eaf7f2;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+      color-scheme: light;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+    button, input, textarea { font: inherit; }
+    a { color: inherit; }
+
+    .app {
+      width: min(1040px, 100%);
+      margin: 0 auto;
+      padding: 14px 16px 90px;
+    }
+
+    .topbar {
+      position: static !important;
+      z-index: auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #f2f7ff 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(22px, 5vw, 32px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .score-pill {
+      min-width: 82px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .score-pill strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+      color: var(--navy);
+    }
+
+    .score-pill span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .layout {
+      position: relative;
+      z-index: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .intro {
+      position: relative;
+      z-index: 0;
+      clear: both;
+      display: grid;
+      gap: 8px;
+      padding: 10px 12px;
+      border-color: #c7d7ea;
+      background: linear-gradient(135deg, var(--blue-soft) 0%, #ffffff 72%);
+      box-shadow: none;
+    }
+
+    .intro h2 {
+      margin: 0;
+      max-width: 760px;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .intro p {
+      margin: 0;
+      max-width: 650px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .quick-actions,
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--drill-color, var(--navy));
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+
+    .btn:hover {
+      border-color: #b8c2cf;
+      background: var(--surface-soft);
+    }
+
+    .btn.primary,
+    .btn.dark {
+      border-color: var(--navy);
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .btn.primary:hover,
+    .btn.dark:hover {
+      border-color: var(--navy-2);
+      background: var(--navy-2);
+    }
+
+    .btn.warn {
+      border-color: #d8b06d;
+      background: #fff8eb;
+      color: #7a4b07;
+    }
+
+    .section-title {
+      display: grid;
+      gap: 4px;
+      padding: 16px 16px 0;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .focus-grid {
+      display: grid;
+      gap: 7px;
+      padding: 12px;
+    }
+
+    .focus-btn {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      min-height: 64px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .focus-btn:hover {
+      background: #f7fbff;
+    }
+
+    .focus-btn.active {
+      border-color: var(--drill-color, var(--navy));
+      background: linear-gradient(90deg, color-mix(in srgb, var(--drill-color, var(--navy)) 12%, white), #ffffff);
+    }
+
+    .focus-icon {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--drill-color, var(--navy)) 14%, white);
+      color: var(--drill-color, var(--navy));
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .focus-btn strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 15px;
+    }
+
+    .focus-btn span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .chev {
+      color: var(--muted);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .workbench {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .drill-head {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--active-color, var(--teal));
+      border-radius: 8px;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--active-color, var(--teal)) 10%, white), var(--surface));
+    }
+
+    .kicker {
+      color: var(--active-color, var(--teal));
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .drill-head h2 {
+      margin: 0;
+      font-size: clamp(26px, 6vw, 40px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .drill-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .meta {
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .meta span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .meta strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 15px;
+    }
+
+    .stepper,
+    .copy-box {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .step-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .step-tab {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .step-tab.active {
+      border-color: var(--navy);
+      background: linear-gradient(180deg, var(--navy), #0d2744);
+      color: #fff;
+    }
+
+    .step-body {
+      min-height: 150px;
+      padding-top: 4px;
+    }
+
+    .step-body h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .step-body p {
+      margin: 0;
+      color: #344054;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .timer-card {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .timer-label {
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .timer-time {
+      font-size: clamp(50px, 16vw, 82px);
+      line-height: 0.96;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-card .btn {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .timer-card .btn.primary {
+      border-color: #fff;
+      background: #fff;
+      color: var(--navy);
+    }
+
+    .term-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .term-chip {
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .term-chip:hover {
+      border-color: var(--teal);
+      background: var(--green-soft);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 128px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .check-item {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      align-items: start;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .check-num {
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .drawer {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 50;
+      display: grid;
+      gap: 12px;
+      max-height: 78vh;
+      padding: 16px;
+      border-top: 1px solid var(--line);
+      border-radius: 8px 8px 0 0;
+      background: var(--surface);
+      box-shadow: 0 -14px 36px rgba(15, 23, 42, 0.18);
+      transform: translateY(110%);
+      transition: transform 180ms ease;
+    }
+
+    .drawer.open {
+      transform: translateY(0);
+    }
+
+    .drawer h2 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .drawer p {
+      margin: 0;
+      color: #344054;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .glossary-list {
+      display: grid;
+      gap: 8px;
+      max-height: 42vh;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .glossary-item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .glossary-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .glossary-item span {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .sources {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .source-link {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: #344054;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .source-link:hover {
+      background: var(--surface-soft);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      left: 12px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
+
+    .nav-btn {
+      min-height: 40px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .status {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    @media (min-width: 860px) {
+      .app {
+        padding-bottom: 28px;
+      }
+
+      .layout {
+        grid-template-columns: 310px 1fr;
+        align-items: start;
+      }
+
+      .intro {
+        grid-column: 1 / -1;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        padding: 10px 12px;
+      }
+
+      .focus-panel {
+        position: sticky;
+        top: 16px;
+      }
+
+      .bottom-nav {
+        display: none;
+      }
+
+      .drawer {
+        right: 24px;
+        bottom: 24px;
+        left: auto;
+        width: min(520px, calc(100% - 48px));
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .workbench {
+        grid-template-columns: minmax(0, 1fr) 260px;
+        align-items: start;
+      }
+
+      .drill-head,
+      .stepper,
+      .copy-box {
+        grid-column: 1;
+      }
+
+      .timer-card {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        position: sticky;
+        top: 16px;
+      }
+
+      .term-strip {
+        grid-column: 1 / -1;
+      }
+
+      #sources {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        padding-right: 12px;
+        padding-left: 12px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding-bottom: 14px;
+      }
+
+      .score-pill {
+        justify-self: start;
+      }
+
+      .quick-actions .btn,
+      .button-row .btn {
+        width: 100%;
+      }
+
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark">1B</div>
+        <div>
+          <h1>First Base Lab</h1>
+          <p>One focus, one drill, one score.</p>
+        </div>
+      </div>
+      <div class="score-pill" aria-label="Weekly points">
+        <strong id="score">0</strong>
+        <span>week pts</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel intro" id="start">
+        <div>
+          <h2>Pick today&apos;s focus.</h2>
+          <p>You&apos;ll get one drill with setup, reps, scoring, a timer, and definitions.</p>
+        </div>
+        <div class="quick-actions">
+          <button class="btn primary" type="button" id="randomBtn">Pick for me</button>
+          <button class="btn" type="button" data-open-drawer="all">Terms</button>
+        </div>
+      </section>
+
+      <section class="panel focus-panel" id="focus">
+        <div class="section-title">
+          <h2>Focus</h2>
+          <p>Tap the thing that feels off.</p>
+        </div>
+        <div class="focus-grid" id="focusGrid"></div>
+      </section>
+
+      <section class="panel" id="work">
+        <div class="workbench">
+          <article class="drill-head" id="drillHead"></article>
+
+          <section class="timer-card" aria-label="Drill timer">
+            <div>
+              <div class="timer-label" id="timerLabel">Timer</div>
+              <div class="timer-time" id="timerTime">10:00</div>
+            </div>
+            <div class="button-row">
+              <button class="btn primary" type="button" id="startTimer">Start</button>
+              <button class="btn" type="button" id="pauseTimer">Pause</button>
+              <button class="btn" type="button" id="resetTimer">Reset</button>
+            </div>
+          </section>
+
+          <section class="stepper" aria-label="Drill steps">
+            <div class="step-tabs" role="tablist" aria-label="Step selector">
+              <button class="step-tab active" type="button" data-step="0">Setup</button>
+              <button class="step-tab" type="button" data-step="1">Run</button>
+              <button class="step-tab" type="button" data-step="2">Score</button>
+            </div>
+            <div class="step-body" id="stepBody"></div>
+            <div class="button-row">
+              <button class="btn" type="button" id="prevStep">Back</button>
+              <button class="btn dark" type="button" id="nextStep">Next</button>
+              <button class="btn primary" type="button" id="logDone">Log done</button>
+            </div>
+            <div class="status" id="logStatus"></div>
+          </section>
+
+          <section class="copy-box">
+            <strong>Quick checklist</strong>
+            <div class="checklist" id="quickChecklist"></div>
+            <div class="button-row">
+              <button class="btn" type="button" id="resetScore">Reset score</button>
+            </div>
+          </section>
+
+          <div class="term-strip" id="termStrip" aria-label="Terms for this drill"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="sources">
+        <div class="section-title">
+          <h2>Sources</h2>
+          <p>Original examples behind the drills.</p>
+        </div>
+        <div class="sources">
+          <a class="source-link" href="https://probaseballinsider.com/pregame-hitting-routine/" target="_blank" rel="noreferrer">Aaron Judge hitting routine</a>
+          <a class="source-link" href="https://www.mlb.com/amp/news/how-juan-soto-developed-his-two-strike-batting-stance.html" target="_blank" rel="noreferrer">Juan Soto two-strike approach</a>
+          <a class="source-link" href="https://www.mlb.com/cubs/news/cubs-first-baseman-anthony-rizzos-two-strike-approach-among-best/c-122962860" target="_blank" rel="noreferrer">Anthony Rizzo two-strike approach</a>
+          <a class="source-link" href="https://www.theoleballgame.com/firstbaseman-pick-drill.html" target="_blank" rel="noreferrer">First-base pick drill</a>
+          <a class="source-link" href="https://www.mlb.com/news/paul-goldschmidt-always-looking-to-improve-c163787596" target="_blank" rel="noreferrer">Paul Goldschmidt offseason speed work</a>
+          <a class="source-link" href="https://www.mlb.com/news/aaron-judge-giancarlo-stanton-change-offseason-workouts" target="_blank" rel="noreferrer">Judge and Stanton mobility emphasis</a>
+          <a class="source-link" href="https://www.mlb.com/amp/news/mookie-betts-adds-javelin-throwing-to-workouts.html" target="_blank" rel="noreferrer">Mookie Betts full-body sequencing note</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Quick navigation">
+    <button class="nav-btn active" type="button" data-scroll="#focus">Focus</button>
+    <button class="nav-btn" type="button" data-scroll="#work">Work</button>
+    <button class="nav-btn" type="button" data-open-drawer="all">Terms</button>
+  </nav>
+
+  <aside class="drawer" id="drawer" aria-live="polite" aria-label="Definitions">
+    <div class="button-row">
+      <button class="btn dark" type="button" id="closeDrawer">Close</button>
+    </div>
+    <div id="drawerContent"></div>
+  </aside>
+
+  <script>
+    const definitions = {
+      "0-2 count": "No balls and two strikes. One more strike ends the at-bat, so the swing usually gets shorter and more controlled.",
+      "athletic stance": "Feet under you, knees slightly bent, chest over the toes, ready to sprint or field.",
+      "backhand side": "The side where you catch with the glove across your body instead of directly in front of you.",
+      "batting practice": "Practice swings against a coach, partner, machine, or pitcher throwing hittable pitches.",
+      "batting tee": "A stand that holds the baseball still so you can swing without timing a pitch.",
+      "chase swing": "A swing at a pitch outside the strike zone that you probably should have taken.",
+      "choke up": "Move your hands slightly higher on the bat handle. This gives more bat control and a shorter swing.",
+      "crossover read": "A first-step sprint movement: open your hips, cross one foot over the other, and accelerate toward the ball or next base.",
+      "dead bug": "A core exercise done lying on your back while slowly moving opposite arm and leg without letting your low back arch.",
+      "first-to-third turn": "A baserunning rep where you round second base aggressively, as if going from first base to third base on a hit.",
+      "front toss": "A partner tosses the ball from in front of the hitter, usually from behind a protective screen.",
+      "glove side": "The side of your body where your glove naturally reaches without crossing your body.",
+      "hamstring floss": "A mobility move for the back of the thigh. Gently straighten and bend the knee through range without forcing a hard stretch.",
+      "hard contact": "A ball hit firmly with the barrel of the bat, not off the handle or end of the bat.",
+      "leg kick": "The hitter's front-leg lift before the swing. Reducing it can make a two-strike swing simpler.",
+      "line drive": "A hard-hit ball that travels on a low, direct path instead of popping high in the air or rolling on the ground.",
+      "opposite-field gap": "For a left-handed hitter, the left-center gap. For a right-handed hitter, the right-center gap.",
+      "pitcher's pitch": "A tough pitch on the edge of the strike zone or in a spot that is hard to drive.",
+      "popup": "A weakly hit ball that goes high in the air, usually because the hitter got under it.",
+      "productive swing": "A swing that helps the at-bat: hard contact, moving a runner, hitting a sacrifice fly, or fouling off a tough two-strike pitch.",
+      "protective screen": "A net or L-screen that protects the person throwing batting practice or front toss.",
+      "pull side": "The side where a hitter naturally pulls the ball: right field for a left-handed hitter, left field for a right-handed hitter.",
+      "rollover": "A weak ground ball caused by the top hand rolling over too early through contact.",
+      "short-hop": "A ball that bounces just before it reaches the glove. First basemen practice this constantly.",
+      "side toss": "A partner kneels or stands to the side of the hitter and softly tosses the ball into the hitting zone.",
+      "spoil a pitch": "Foul off a tough pitch so the at-bat continues instead of taking strike three.",
+      "stance": "How the hitter sets the feet and body before the pitch. A wider stance can make the swing quieter with two strikes.",
+      "upper-back rotation": "Rotation through the upper back. Hitters need it to turn without forcing the low back to do all the work.",
+      "90/90 hip switch": "A hip mobility drill with both knees bent at roughly 90 degrees while rotating from one seated hip position to the other.",
+      "ankle rocks": "A mobility drill where you drive the knee forward over the foot while keeping the heel down."
+    };
+
+    const drills = [
+      {
+        id: "two-strike",
+        focus: "Two-strike at-bats",
+        symptom: "You are expanding the zone or getting big with two strikes.",
+        icon: "2K",
+        color: "#b43b33",
+        title: "Soto Two-Strike Round",
+        pro: "Juan Soto",
+        minutes: 10,
+        points: 10,
+        summary: "Shorten the swing without turning defensive. The goal is hard contact through center field or the opposite-field gap.",
+        steps: [
+          { title: "Setup", body: "Use a batting tee, front toss, or a coach/partner throwing batting practice. Mark three targets: left-center, center field, and right-center." },
+          { title: "Run it", body: "Take 25 swings. Choke up slightly, widen your stance, reduce the leg kick, and try to hit hard line drives through center field or the opposite-field gap." },
+          { title: "Score it", body: "Win if 15 or more balls are hard contact and 5 or fewer are weak ground balls to the pull side, popups, or chase swings." }
+        ],
+        terms: ["0-2 count", "batting tee", "front toss", "batting practice", "choke up", "stance", "leg kick", "line drive", "opposite-field gap", "hard contact", "pull side", "popup", "chase swing"],
+        checklist: [
+          "Take 25 swings.",
+          "Move your hands slightly higher on the bat.",
+          "Widen your stance and reduce the leg kick.",
+          "Drive line drives through center field or the opposite-field gap.",
+          "Win at 15+ hard-contact swings."
+        ]
+      },
+      {
+        id: "first-base",
+        focus: "First-base picks",
+        symptom: "You want to save more bad throws around the bag.",
+        icon: "1B",
+        color: "#0e5f4f",
+        title: "First Base Pick Circuit",
+        pro: "Elite first basemen",
+        minutes: 8,
+        points: 10,
+        summary: "Work the footwork and low-bounce catches that turn bad throws into outs.",
+        steps: [
+          { title: "Setup", body: "Use a partner 35 to 60 feet away, first base, and about 10 balls. Start one step behind the bag, not already stretched out." },
+          { title: "Run it", body: "Partner throws 30 balls: 10 normal, 8 that bounce right before your glove, 6 to your glove side, and 6 to your backhand side. Find the bag with your foot, read the throw, then stretch." },
+          { title: "Score it", body: "Win if you secure 24 or more cleanly. A clean rep means catch or pick first, foot stays connected to the bag, and your glove works through the ball." }
+        ],
+        terms: ["short-hop", "glove side", "backhand side"],
+        checklist: [
+          "Take 30 throws from a partner.",
+          "Start one step behind the bag.",
+          "Find the bag with your foot.",
+          "Read the throw, then stretch.",
+          "Win at 24 clean catches or picks."
+        ]
+      },
+      {
+        id: "timing",
+        focus: "Swing timing",
+        symptom: "You feel late, rushed, or out of rhythm.",
+        icon: "T",
+        color: "#24466f",
+        title: "Judge Swing Progression",
+        pro: "Aaron Judge",
+        minutes: 7,
+        points: 5,
+        summary: "Build from controlled swings to real at-bat swings instead of jumping straight into full-speed swings.",
+        steps: [
+          { title: "Setup", body: "Use a batting tee, a partner, or a machine. Pick one focus before starting: hit through center field, hit the outside pitch, or start the swing on time." },
+          { title: "Run it", body: "Hit 5 balls off the batting tee. Then take 6 side-toss swings. Then take 10 front-toss swings. Finish with 10 full-focus swings like a real at-bat." },
+          { title: "Score it", body: "Win if the last 10 swings include 6 or more balls hit hard on your chosen focus. Step out and reset after any ugly swing." }
+        ],
+        terms: ["batting tee", "side toss", "front toss", "hard contact", "protective screen"],
+        checklist: [
+          "Pick one focus before starting.",
+          "Hit 5 balls off a batting tee.",
+          "Take 6 side-toss swings.",
+          "Take 10 front-toss swings.",
+          "Finish with 10 full-focus swings."
+        ]
+      },
+      {
+        id: "speed",
+        focus: "First step and bases",
+        symptom: "You want quicker starts and better turns.",
+        icon: "Go",
+        color: "#c9881a",
+        title: "Goldschmidt Speed Add-On",
+        pro: "Paul Goldschmidt",
+        minutes: 6,
+        points: 5,
+        summary: "A short speed block for better starts, baserunning turns, and reaction movement.",
+        steps: [
+          { title: "Setup", body: "Use a foul line, bases, or cones. Rest 45 to 60 seconds between reps so every rep is fast." },
+          { title: "Run it", body: "Do 6 short sprints for 10 yards from an athletic stance. Then do 4 first-to-third turns. Finish with 4 crossover reads." },
+          { title: "Score it", body: "Win if every rep feels explosive. Stop the drill if the last two reps are clearly slower or sloppy." }
+        ],
+        terms: ["athletic stance", "first-to-third turn", "crossover read"],
+        checklist: [
+          "Rest 45 to 60 seconds between reps.",
+          "Run 6 short starts for 10 yards.",
+          "Run 4 first-to-third turns.",
+          "Run 4 crossover reads.",
+          "Stop if the last two reps get sloppy."
+        ]
+      },
+      {
+        id: "mobility",
+        focus: "Body readiness",
+        symptom: "You feel stiff, slow, or beat up before work.",
+        icon: "M",
+        color: "#5c4c97",
+        title: "Big-Body Mobility",
+        pro: "Judge / Stanton / Betts",
+        minutes: 10,
+        points: 5,
+        summary: "Ten minutes to get hips, upper back, hamstrings, ankles, and trunk ready before baseball work.",
+        steps: [
+          { title: "Setup", body: "Use open floor space. Move slowly enough that you can breathe through every rep." },
+          { title: "Run it", body: "Do 2 minutes each: 90/90 hip switches, kneeling upper-back rotations, hamstring floss, ankle rocks, and dead bugs." },
+          { title: "Score it", body: "Win if you finish all 10 minutes without rushing. If anything pinches or hurts, skip it and ask the trainer." }
+        ],
+        terms: ["90/90 hip switch", "upper-back rotation", "hamstring floss", "ankle rocks", "dead bug"],
+        checklist: [
+          "Move slowly enough to breathe through each rep.",
+          "Do 2 minutes of 90/90 hip switches.",
+          "Do 2 minutes of upper-back rotations.",
+          "Do 2 minutes each of hamstring floss and ankle rocks.",
+          "Finish with 2 minutes of dead bugs."
+        ]
+      },
+      {
+        id: "competitive-ab",
+        focus: "Competitive at-bats",
+        symptom: "You want two-strike work to feel like a real plate appearance.",
+        icon: "AB",
+        color: "#6a4b28",
+        title: "Rizzo Two-Strike Batting Practice",
+        pro: "Anthony Rizzo",
+        minutes: 10,
+        points: 10,
+        summary: "Make two-strike hitting competitive instead of treating it like survival mode.",
+        steps: [
+          { title: "Setup", body: "Use front toss, batting practice, or a machine. Imagine every pitch is an 0-2 count with a runner on second and less than two outs." },
+          { title: "Run it", body: "Take 20 pitches. Use the same swing pattern, but smaller: less leg kick, shorter stride, hands direct to the ball." },
+          { title: "Score it", body: "Win if 12 or more pitches are productive swings: hard line drive, deep fly ball, ground ball through the middle, or a foul ball that keeps the at-bat alive on a tough pitch." }
+        ],
+        terms: ["front toss", "batting practice", "0-2 count", "leg kick", "productive swing", "line drive", "spoil a pitch", "pitcher's pitch"],
+        checklist: [
+          "Take 20 pitches.",
+          "Treat every pitch like an 0-2 count.",
+          "Use less leg kick and a shorter stride.",
+          "Keep your hands direct to the ball.",
+          "Win at 12 productive swings."
+        ]
+      }
+    ];
+
+    const state = {
+      activeDrill: drills[0],
+      step: 0,
+      timerSeconds: drills[0].minutes * 60,
+      timerBase: drills[0].minutes * 60,
+      timerId: null
+    };
+
+    const scoreKey = "firstBaseLabScore";
+    const scoreEl = document.getElementById("score");
+    const focusGrid = document.getElementById("focusGrid");
+    const drillHead = document.getElementById("drillHead");
+    const stepBody = document.getElementById("stepBody");
+    const timerTime = document.getElementById("timerTime");
+    const timerLabel = document.getElementById("timerLabel");
+    const quickChecklist = document.getElementById("quickChecklist");
+    const termStrip = document.getElementById("termStrip");
+    const logStatus = document.getElementById("logStatus");
+    const drawer = document.getElementById("drawer");
+    const drawerContent = document.getElementById("drawerContent");
+
+    function getScore() {
+      return Number(localStorage.getItem(scoreKey) || 0);
+    }
+
+    function setScore(value) {
+      localStorage.setItem(scoreKey, String(value));
+      scoreEl.textContent = value;
+    }
+
+    function formatTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+      const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+      return `${minutes}:${seconds}`;
+    }
+
+    function stopTimer() {
+      if (state.timerId) {
+        clearInterval(state.timerId);
+        state.timerId = null;
+      }
+    }
+
+    function resetTimerForDrill(drill) {
+      stopTimer();
+      state.timerBase = drill.minutes * 60;
+      state.timerSeconds = state.timerBase;
+      timerLabel.textContent = `${drill.title} timer`;
+      timerTime.textContent = formatTime(state.timerSeconds);
+    }
+
+    function renderFocus() {
+      focusGrid.innerHTML = drills.map((drill) => `
+        <button class="focus-btn ${drill.id === state.activeDrill.id ? "active" : ""}" type="button" data-drill="${drill.id}" style="--drill-color:${drill.color}">
+          <span class="focus-icon">${drill.icon}</span>
+          <span><strong>${drill.focus}</strong><span>${drill.symptom}</span></span>
+          <span class="chev">›</span>
+        </button>
+      `).join("");
+    }
+
+    function renderDrill() {
+      const drill = state.activeDrill;
+      const step = drill.steps[state.step];
+      drillHead.style.setProperty("--active-color", drill.color);
+      drillHead.innerHTML = `
+        <div class="kicker">${drill.pro}</div>
+        <h2>${drill.title}</h2>
+        <p>${drill.summary}</p>
+        <div class="meta-grid">
+          <div class="meta"><span>Time</span><strong>${drill.minutes} min</strong></div>
+          <div class="meta"><span>Points</span><strong>${drill.points}</strong></div>
+          <div class="meta"><span>Focus</span><strong>${drill.focus}</strong></div>
+        </div>
+      `;
+
+      document.querySelectorAll(".step-tab").forEach((tab) => {
+        tab.classList.toggle("active", Number(tab.dataset.step) === state.step);
+      });
+
+      stepBody.innerHTML = `
+        <h3>${step.title}</h3>
+        <p>${step.body}</p>
+      `;
+
+      quickChecklist.innerHTML = drill.checklist.map((item, index) => `
+        <div class="check-item">
+          <span class="check-num">${index + 1}</span>
+          <span>${item}</span>
+        </div>
+      `).join("");
+      termStrip.innerHTML = drill.terms.map((term) => `<button class="term-chip" type="button" data-term="${term}">${term}</button>`).join("");
+      logStatus.textContent = "";
+    }
+
+    function chooseDrill(id) {
+      const next = drills.find((drill) => drill.id === id);
+      if (!next) return;
+      state.activeDrill = next;
+      state.step = 0;
+      resetTimerForDrill(next);
+      renderFocus();
+      renderDrill();
+      document.querySelector("#work").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function openDrawer(term) {
+      if (term === "all") {
+        drawerContent.innerHTML = `
+          <h2>Terms</h2>
+          <p>Tap a term on a drill card when you need it. This is the full list.</p>
+          <div class="glossary-list">
+            ${Object.entries(definitions).map(([name, value]) => `<div class="glossary-item"><strong>${name}</strong><span>${value}</span></div>`).join("")}
+          </div>
+        `;
+      } else {
+        drawerContent.innerHTML = `
+          <h2>${term}</h2>
+          <p>${definitions[term] || "Definition not found."}</p>
+        `;
+      }
+      drawer.classList.add("open");
+    }
+
+    focusGrid.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-drill]");
+      if (button) chooseDrill(button.dataset.drill);
+    });
+
+    document.querySelectorAll(".step-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        state.step = Number(tab.dataset.step);
+        renderDrill();
+      });
+    });
+
+    document.getElementById("nextStep").addEventListener("click", () => {
+      state.step = Math.min(2, state.step + 1);
+      renderDrill();
+    });
+
+    document.getElementById("prevStep").addEventListener("click", () => {
+      state.step = Math.max(0, state.step - 1);
+      renderDrill();
+    });
+
+    document.getElementById("startTimer").addEventListener("click", () => {
+      if (state.timerId) return;
+      state.timerId = setInterval(() => {
+        state.timerSeconds = Math.max(0, state.timerSeconds - 1);
+        timerTime.textContent = formatTime(state.timerSeconds);
+        if (state.timerSeconds === 0) stopTimer();
+      }, 1000);
+    });
+
+    document.getElementById("pauseTimer").addEventListener("click", stopTimer);
+    document.getElementById("resetTimer").addEventListener("click", () => {
+      stopTimer();
+      state.timerSeconds = state.timerBase;
+      timerTime.textContent = formatTime(state.timerSeconds);
+    });
+
+    document.getElementById("logDone").addEventListener("click", () => {
+      setScore(getScore() + state.activeDrill.points);
+      logStatus.textContent = `Logged ${state.activeDrill.points} points for ${state.activeDrill.title}.`;
+    });
+
+    document.getElementById("resetScore").addEventListener("click", () => {
+      setScore(0);
+      logStatus.textContent = "Weekly score reset.";
+    });
+
+    document.getElementById("randomBtn").addEventListener("click", () => {
+      const next = drills[Math.floor(Math.random() * drills.length)];
+      chooseDrill(next.id);
+    });
+
+    termStrip.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-term]");
+      if (button) openDrawer(button.dataset.term);
+    });
+
+    document.querySelectorAll("[data-open-drawer]").forEach((button) => {
+      button.addEventListener("click", () => openDrawer(button.dataset.openDrawer));
+    });
+
+    document.getElementById("closeDrawer").addEventListener("click", () => {
+      drawer.classList.remove("open");
+    });
+
+    document.querySelectorAll("[data-scroll]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelector(button.dataset.scroll).scrollIntoView({ behavior: "smooth", block: "start" });
+        document.querySelectorAll(".nav-btn").forEach((nav) => nav.classList.remove("active"));
+        button.classList.add("active");
+      });
+    });
+
+    setScore(getScore());
+    renderFocus();
+    resetTimerForDrill(state.activeDrill);
+    renderDrill();
+  </script>
+</body>
+</html>
